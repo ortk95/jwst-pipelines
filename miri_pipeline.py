@@ -397,8 +397,8 @@ def run_pipeline(
             `desaturate` is False, then this argument will be ignored. The data with all
             groups will always be included.
         skip_group_1_saturation_step: Toggle skipping the pipeline's saturation step when
-            processing 1 group data. This will prevent any data being flagged as
-            saturated for the first group file.
+            processing 1 group data. This will create an additional "0_groups" directory
+            which contains 1 group data with the saturation step skipped.
         background_subtract: Toggle background subtraction. If True, the backgrounds
             in the `background_path` directory will be subtracted from the data in
             `stage2`. If 'both' (the default), then versions with and without background

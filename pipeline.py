@@ -115,8 +115,8 @@ class Pipeline:
             `desaturate` is False, then this argument will be ignored. The data with all
             groups will always be included.
         skip_group_1_saturation_step: Toggle skipping the pipeline's saturation step when
-            processing 1 group data. This will prevent any data being flagged as
-            saturated for the first group file. # XXX
+            processing 1 group data. This will create an additional "0_groups" directory
+            which contains 1 group data with the saturation step skipped.
         background_subtract: Toggle background subtraction. If True, the backgrounds
             in the `background_path` directory will be subtracted from the data in
             `stage2`.
@@ -192,7 +192,9 @@ class Pipeline:
         self.root_path = RootPath(self.standardise_path(root_path))
         self.desaturate = desaturate
         self.groups_to_use = groups_to_use
-        self.background_subtract = background_subtract
+        self.background_subtract = (
+            False if background_path is None else background_subtract
+        )
         self.background_path = self.standardise_path(background_path)
         self.basic_navigation = basic_navigation
         self.skip_group_1_saturation_step = skip_group_1_saturation_step
@@ -1131,8 +1133,8 @@ def get_pipeline_argument_parser(
         '--skip-group-1-saturation-step',
         action=argparse.BooleanOptionalAction,
         help="""Toggle skipping the pipeline's saturation step when
-            processing 1 group data. This will prevent any data being flagged as
-            saturated for the first group file.
+            processing 1 group data. This will create an additional "0_groups" directory
+            which contains 1 group data with the saturation step skipped.
             """,
     )
     parser.add_argument(

@@ -159,7 +159,7 @@ class Pipeline:
         root_path: str,
         *,
         parallel: float | bool = False,
-        desaturate: bool = False,
+        desaturate: bool | Literal['max'] = False,
         groups_to_use: list[int] | None | str = None,
         skip_group_1_saturation_step: bool = False,
         background_subtract: BoolOrBoth = 'both',
@@ -190,6 +190,18 @@ class Pipeline:
         self.reduction_parallel_kwargs = reduction_parallel_kwargs
         self.step_kwargs = step_kwargs or {}
         self.root_path = RootPath(self.standardise_path(root_path))
+
+        if desaturate == 'max':
+            desaturate = True
+            skip_group_1_saturation_step = True
+            self.step_kwargs = merge_nested_dicts(
+                self.step_kwargs,
+                {
+                    "stage3": {
+                        "steps": {"pixel_replace": {"skip": False}},
+                    }
+                },
+            )
         self.desaturate = desaturate
         self.groups_to_use = groups_to_use
         self.background_subtract = (
@@ -1120,7 +1132,8 @@ def get_pipeline_argument_parser(
         value is given, then all available cores will be used (i.e. `--parallel` is 
         equivalent to `--parallel 1`).""",
     )
-    parser.add_argument(
+    desaturation_group = parser.add_mutually_exclusive_group()
+    desaturation_group.add_argument(
         '--desaturate',
         action=argparse.BooleanOptionalAction,
         help="""Toggle desaturation of the data. If desaturation is enabled the 
@@ -1128,6 +1141,17 @@ def get_pipeline_argument_parser(
             combined in the `desaturate` step to produce a desaturated data cube. This
             desaturation is disabled by default.
             """,
+    )
+    desaturation_group.add_argument(
+        '--max-desaturate',
+        action='store_const',
+        const='max',
+        dest='desaturate',
+        help="""Shortcut to enable desaturation with the maximum possible desaturation
+        possible. This is equivalent to passing --desaturate
+        --skip-group-1-saturation-step --kwargs
+        '{"stage3": {"steps": {"pixel_replace": {"skip": false}}}}'.
+        """,
     )
     parser.add_argument(
         '--skip-group-1-saturation-step',

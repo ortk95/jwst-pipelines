@@ -162,7 +162,7 @@ def make_summary_plot(
             skipped_groups = primary_header['HIERARCH DESAT SATURATION_SKIPPED_GROUPS']
             if skipped_groups != 'None':
                 reduction_notes.append(
-                    f'Saturation steps skipped for groups: {skipped_groups}'
+                    f'Saturation step skipped for groups: {skipped_groups}'
                 )
         reduction_notes.extend(get_header_reduction_notes(hdul))
     instrument = primary_header['INSTRUME']
